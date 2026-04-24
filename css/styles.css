@@ -1,0 +1,234 @@
+/*RESET*/
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+/*BODY*/
+body{
+  background:#000;
+  color:#fff;
+  font-family:'Poppins',sans-serif;
+}
+
+/*FONDO MATRIX*/
+#bg-canvas{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
+
+/*NAVBAR*/
+.navbar{
+  background:#000 !important;
+}
+
+/*HERO (PORTADA)*/
+.hero{
+  padding:150px 20px;
+  text-align:center;
+}
+
+/*SECCIONES PRINCIPALES - solo las que tienen id */
+section[id]{
+  background:#111;
+  margin:30px auto;
+  padding:30px;
+  max-width:1000px;
+  border-radius:10px;
+}
+
+/*TEXTO GENERAL*/
+h1, h2, h3, h4,
+p, span, a,
+.skill p,
+.project h4,
+.project p {
+  color:#fff;
+}
+
+/*BOOTSTRAP FIX*/
+.text-muted{
+  color:#fff !important;
+}
+
+/*HABILIDADES (BARRAS)*/
+.skill{
+  margin:15px 0;
+}
+
+.bar{
+  width:100%;
+  height:10px;
+  background:#333;
+  /* resetear los estilos que heredaría de section[id] */
+  margin:0;
+  padding:0;
+  max-width:none;
+  border-radius:0;
+}
+
+.bar span{
+  display:block;
+  height:100%;
+  background:#00ff88;
+}
+
+/*PROYECTOS*/
+.project img{
+  width: 100%;
+  height: 200px; 
+  object-fit: cover; 
+  border-radius: 10px;
+}
+/* TODO EL TEXTO PRINCIPAL EN BLANCO */
+body,
+.hero h1,
+.hero p,
+section h2,
+section h3,
+section h4,
+section p,
+.skill p,
+.project h4,
+.project p,
+.container,
+span {
+  color: #ffffff !important;
+}
+
+/*TITULOS  */
+h1, h2, h3, h4 {
+  color: #ffffff !important;
+}
+
+/*ESTOPOR BOOTSTRAP TIENE ALGUN PROBLEMA*/
+.text-muted {
+  color: #ffffff !important;
+}
+#mensajeExito {
+    color: #000 !important;
+}
+/*GLASSMORPHISM REAL*/
+.glass{
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
+}
+
+/*HOVER SUAVE*/
+.glass:hover{
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,255,136,0.2);
+}
+
+/*HERO MEJORADO*/
+.hero h1{
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+.hero p{
+  opacity: 0.8;
+}
+
+/* FOTO PERFIL*/
+.profile-img{
+  border: 3px solid #00ff88;
+  transition: transform 0.3s ease;
+}
+
+.profile-img:hover{
+  transform: scale(1.05);
+}
+
+/* BOTONES*/
+.btn-primary{
+  background: linear-gradient(45deg, #00ff88, #00c3ff);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover{
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0,255,136,0.5);
+}
+
+/*PROYECTOS HOVER*/
+.project img{
+  transition: transform 0.4s ease;
+}
+
+.project:hover img{
+  transform: scale(1.08);
+}
+
+/*BARRAS ANIMADAS*/
+.bar span{
+  animation: growBar 2s ease forwards;
+}
+
+@keyframes growBar{
+  from{
+    width: 0;
+  }
+}
+
+/*SCROLL*/
+html{
+  scroll-behavior: smooth;
+}
+
+/*ANIMAR EL SCROLL*/
+.reveal{
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s ease;
+}
+
+.reveal.active{
+  opacity: 1;
+  transform: translateY(0);
+}
+.whatsapp-float,
+.facebook-float,
+.instagram-float {
+  position: fixed;
+  right: 20px;
+  z-index: 1000;
+  border-radius: 50%;
+  padding: 14px;
+  color: white;
+  font-size: 20px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.whatsapp-float {
+  bottom: 20px;
+  background: #25D366;
+}
+
+.facebook-float {
+  bottom: 80px;
+  background: #1877F2;
+}
+
+.instagram-float {
+  bottom: 140px;
+  background: #E1306C;
+}
+.whatsapp-float:hover,
+.facebook-float:hover,
+.instagram-float:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 15px rgba(0,255,136,0.6);
+}

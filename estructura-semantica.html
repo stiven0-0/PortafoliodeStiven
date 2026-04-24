@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estructura Cero DIVs</title>
+    <style>
+        /* Estilos Generales */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+            background-color: #f0f2f5;
+        }
+
+        /* Contenedor Morado Principal */
+        .wrapper {
+            border: 6px solid #6a1b9a;
+            padding: 10px;
+            width: 450px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Bloques base */
+        .box {
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Bloque Superior (Header) */
+        header {
+            border: 2px solid #333;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        header .nav-green { background-color: #e8f5e9; height: 35px; border-color: #2e7d32; }
+        header .nav-blue { background-color: #e3f2fd; height: 35px; border-color: #1565c0; }
+        header .hero-yellow { background-color: #fff9c4; height: 350px; border-color: #333; }
+
+        /* Bloque Medio (Main Content) */
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .main-red { background-color: #ffebe6; border: 1.5px solid #ff5252; height: 450px; }
+
+        .sidebar-cyan {
+            border: 2px solid #00acc1;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sidebar-cyan .small-box { height: 30px; border-color: #00acc1; }
+        .sidebar-cyan .large-box { height: 180px; background-color: #ffe0b2; border-color: #00acc1; }
+
+        /* Bloque Inferior (Section) */
+        section.split-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .feature-blue { background-color: #e3f2fd; border: 1.5px solid #ff5252; height: 400px; }
+
+        .sidebar-blue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .sidebar-blue-list .blue-box { background-color: #e3f2fd; height: 50px; border-color: #2979ff; }
+
+        /* Footer */
+        footer {
+            border: 2px solid #333;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .foot-top { background-color: #ede7f6; border: 1.5px solid #ff5252; height: 25px; }
+        .foot-mid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .foot-mid .item { background-color: #e8f5e9; border: 1.5px solid #333; height: 35px; }
+        .foot-bottom { background-color: #e8f5e9; border: 1.5px solid #ff5252; height: 25px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        
+        <header>
+            <nav class="box nav-green">CAJA</nav>
+            <nav class="box nav-blue">CAJA</nav>
+            <article class="box hero-yellow">CAJA</article>
+        </header>
+
+        <main>
+            <article class="box main-red">CAJA</article>
+            <aside class="sidebar-cyan">
+                <nav class="box small-box">CAJA</nav>
+                <section class="box large-box">CAJA</section>
+                <section class="box large-box">CAJA</section>
+            </aside>
+        </main>
+
+        <section class="split-section">
+            <article class="box feature-blue">CAJA</article>
+            <aside class="sidebar-blue-list">
+                <nav class="box blue-box">CAJA</nav>
+                <nav class="box blue-box">CAJA</nav>
+            </aside>
+        </section>
+
+        <footer>
+            <div class="box foot-top">CAJA</div>
+            <div class="foot-mid">
+                <div class="box item">CAJA</div>
+                <div class="box item">CAJA</div>
+                <div class="box item">CAJA</div>
+                <div class="box item">CAJA</div>
+            </div>
+            <div class="box foot-bottom">CAJA</div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

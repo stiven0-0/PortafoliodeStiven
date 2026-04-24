@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Focus App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --c1: #0d0221;
+      --c2: #1a0a3b;
+      --c3: #2d1b69;
+      --accent1: #7c3aed;
+      --accent2: #06b6d4;
+      --accent3: #f0abfc;
+      --glass: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.12);
+      --text: #f1e9ff;
+      --muted: rgba(241,233,255,0.45);
+      --radius: 20px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--c1) 0%, var(--c2) 45%, var(--c3) 100%);
+      position: relative;
+    }
+
+    /* Animated mesh blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+    }
+    body::before {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, var(--accent1), transparent 70%);
+      top: -150px; left: -150px;
+      animation: blob1 14s ease-in-out infinite alternate;
+    }
+    body::after {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--accent2), transparent 70%);
+      bottom: -100px; right: -100px;
+      animation: blob2 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes blob1 { to { transform: translate(120px, 80px) scale(1.15); } }
+    @keyframes blob2 { to { transform: translate(-100px, -60px) scale(1.2); } }
+
+    .blob3 {
+      position: fixed;
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, var(--accent3), transparent 70%);
+      top: 40%; left: 60%;
+      filter: blur(80px);
+      opacity: 0.18;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: blob3 20s ease-in-out infinite alternate;
+    }
+    @keyframes blob3 { to { transform: translate(-80px, 60px) scale(0.85); } }
+
+    /* Layout */
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeDown 0.7s ease both;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 4px 24px rgba(124,58,237,0.5);
+    }
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, var(--text), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .date-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--muted);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      padding: 8px 16px;
+      border-radius: 100px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Glass card base */
+    .card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(16px);
+      padding: 28px;
+    }
+
+    /* Timer */
+    .timer-card {
+      text-align: center;
+      padding: 48px 28px;
+      animation: fadeUp 0.7s 0.1s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+    .timer-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.08));
+      z-index: 0;
+    }
+    .timer-card > * { position: relative; z-index: 1; }
+
+    .session-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .session-label::before, .session-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+      max-width: 80px;
+    }
+
+    .timer-display {
+      font-size: clamp(5rem, 18vw, 9rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent3) 70%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-ring {
+      width: 180px; height: 180px;
+      margin: 0 auto 24px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .timer-ring svg {
+      position: absolute;
+      inset: 0;
+      transform: rotate(-90deg);
+    }
+    .ring-bg { stroke: rgba(255,255,255,0.08); }
+    .ring-progress {
+      stroke: url(#ringGrad);
+      stroke-dasharray: 502;
+      stroke-dashoffset: 502;
+      transition: stroke-dashoffset 1s linear;
+      filter: drop-shadow(0 0 8px var(--accent1));
+    }
+    .timer-inner {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #fff, var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .mode-tab {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 100px;
+      border: 1px solid var(--glass-border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .mode-tab.active {
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    }
+    .mode-tab:not(.active):hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+    }
+    .btn-primary {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 16px 48px;
+      border-radius: 100px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 6px 30px rgba(124,58,237,0.45);
+      letter-spacing: 0.02em;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 10px 40px rgba(124,58,237,0.6);
+    }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-icon {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      color: var(--muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+    .btn-icon:hover { color: var(--text); border-color: rgba(255,255,255,0.3); transform: scale(1.08); }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+    .stat-card {
+      text-align: center;
+      padding: 22px 16px;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, var(--text), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Tasks */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .task-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent2);
+      background: rgba(6,182,212,0.1);
+      padding: 4px 12px;
+      border-radius: 100px;
+      border: 1px solid rgba(6,182,212,0.25);
+    }
+
+    .tasks-card { animation: fadeUp 0.7s 0.3s ease both; }
+
+    .task-input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .task-input {
+      flex: 1;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem;
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .task-input::placeholder { color: var(--muted); }
+    .task-input:focus {
+      border-color: rgba(124,58,237,0.6);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+    }
+    .btn-add {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+    }
+    .btn-add:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(124,58,237,0.55); }
+
+    .task-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.03);
+      transition: all 0.25s;
+      cursor: pointer;
+      animation: slideIn 0.3s ease both;
+    }
+    .task-item:hover { background: rgba(255,255,255,0.07); border-color: rgba(124,58,237,0.4); }
+    .task-item.done { opacity: 0.5; }
+    .task-item.done .task-text { text-decoration: line-through; color: var(--muted); }
+
+    .task-check {
+      width: 22px; height: 22px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.2);
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+      background: transparent;
+      cursor: pointer;
+    }
+    .task-item.done .task-check {
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      border-color: transparent;
+    }
+    .check-icon { display: none; font-size: 0.7rem; }
+    .task-item.done .check-icon { display: block; }
+
+    .task-text {
+      flex: 1;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .task-priority {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .priority-high { background: #f87171; box-shadow: 0 0 8px rgba(248,113,113,0.6); }
+    .priority-mid { background: var(--accent3); box-shadow: 0 0 8px rgba(240,171,252,0.5); }
+    .priority-low { background: var(--accent2); box-shadow: 0 0 8px rgba(6,182,212,0.5); }
+
+    .task-del {
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+      padding: 4px;
+      border-radius: 6px;
+    }
+    .task-item:hover .task-del { opacity: 1; }
+    .task-del:hover { color: #f87171; }
+
+    /* Quote */
+    .quote-card {
+      padding: 32px;
+      text-align: center;
+      animation: fadeUp 0.7s 0.4s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+    .quote-card::before {
+      content: '"';
+      position: absolute;
+      top: -20px;
+      left: 20px;
+      font-size: 10rem;
+      font-weight: 800;
+      color: rgba(124,58,237,0.1);
+      line-height: 1;
+      font-family: Georgia, serif;
+    }
+    .quote-text {
+      font-size: 1.05rem;
+      font-style: italic;
+      line-height: 1.7;
+      color: var(--text);
+      position: relative;
+      z-index: 1;
+      opacity: 0.85;
+    }
+    .quote-author {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-top: 14px;
+    }
+
+    /* Bottom nav */
+    nav {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      background: rgba(13,2,33,0.85);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      padding: 8px;
+      border-radius: 100px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+      z-index: 100;
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 10px 20px;
+      border-radius: 100px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .nav-btn .nav-icon { font-size: 1.1rem; }
+    .nav-btn.active {
+      background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.2));
+      color: var(--text);
+    }
+    .nav-btn:not(.active):hover { color: var(--text); }
+
+    /* Animations */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-16px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.4); border-radius: 10px; }
+
+    /* Pulsing ring on running */
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(124,58,237,0.5); }
+      70%  { box-shadow: 0 0 0 16px rgba(124,58,237,0); }
+      100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); }
+    }
+    .btn-primary.running { animation: pulse-ring 2s infinite; }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: repeat(3,1fr); gap: 10px; }
+      .stat-value { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="blob3"></div>
+
+<div class="app">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🎯</div>
+      <h1>Focus</h1>
+    </div>
+    <div class="date-badge" id="dateBadge"></div>
+  </header>
+
+  <!-- Timer -->
+  <div class="card timer-card">
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mins="25" onclick="setMode(this,25,'Foco profundo')">Pomodoro</button>
+      <button class="mode-tab" data-mins="5" onclick="setMode(this,5,'Descanso corto')">Pausa corta</button>
+      <button class="mode-tab" data-mins="15" onclick="setMode(this,15,'Descanso largo')">Pausa larga</button>
+    </div>
+    <div class="session-label" id="sessionLabel">Foco profundo</div>
+
+    <div class="timer-ring">
+      <svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7c3aed"/>
+            <stop offset="100%" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-bg" cx="90" cy="90" r="80" stroke-width="8"/>
+        <circle class="ring-progress" id="ringProgress" cx="90" cy="90" r="80" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+      <div class="timer-inner" id="timerDisplay">25:00</div>
+    </div>
+
+    <div class="timer-controls">
+      <button class="btn-icon" onclick="resetTimer()" title="Reiniciar">↺</button>
+      <button class="btn-primary" id="startBtn" onclick="toggleTimer()">Iniciar</button>
+      <button class="btn-icon" onclick="skipSession()" title="Saltar">⏭</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="card stat-card">
+      <div class="stat-value" id="statSessions">0</div>
+      <div class="stat-label">Sesiones</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" id="statMinutes">0</div>
+      <div class="stat-label">Minutos</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" id="statTasks">0</div>
+      <div class="stat-label">Tareas ✓</div>
+    </div>
+  </div>
+
+  <!-- Tasks -->
+  <div class="card tasks-card">
+    <div class="section-header">
+      <span class="section-title">Mis tareas</span>
+      <span class="task-count" id="taskCount">0 pendientes</span>
+    </div>
+    <div class="task-input-row">
+      <input class="task-input" id="taskInput" type="text" placeholder="Agregar nueva tarea..." maxlength="80"
+        onkeydown="if(event.key==='Enter') addTask()" />
+      <button class="btn-add" onclick="addTask()">+</button>
+    </div>
+    <div class="task-list" id="taskList"></div>
+  </div>
+
+  <!-- Quote -->
+  <div class="card quote-card">
+    <div class="quote-text" id="quoteText"></div>
+    <div class="quote-author" id="quoteAuthor"></div>
+  </div>
+
+</div>
+
+<!-- Bottom Nav -->
+<nav>
+  <button class="nav-btn active" onclick="setNav(this)">
+    <span class="nav-icon">⏱</span>Timer
+  </button>
+  <button class="nav-btn" onclick="setNav(this)">
+    <span class="nav-icon">✅</span>Tareas
+  </button>
+  <button class="nav-btn" onclick="setNav(this)">
+    <span class="nav-icon">📊</span>Stats
+  </button>
+  <button class="nav-btn" onclick="setNav(this)">
+    <span class="nav-icon">⚙️</span>Config
+  </button>
+</nav>
+
+<script>
+// ── Date ──
+const dateBadge = document.getElementById('dateBadge');
+const now = new Date();
+dateBadge.textContent = now.toLocaleDateString('es-CO', { weekday:'short', day:'numeric', month:'short' }).replace(/^\w/, c => c.toUpperCase());
+
+// ── Timer ──
+let totalSeconds = 25 * 60;
+let remaining = totalSeconds;
+let running = false;
+let interval = null;
+let sessions = 0;
+let totalMinutes = 0;
+
+const timerDisplay = document.getElementById('timerDisplay');
+const startBtn = document.getElementById('startBtn');
+const ring = document.getElementById('ringProgress');
+const CIRCUMFERENCE = 502;
+
+function updateDisplay() {
+  const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+  const s = String(remaining % 60).padStart(2, '0');
+  timerDisplay.textContent = `${m}:${s}`;
+  const progress = 1 - remaining / totalSeconds;
+  ring.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+  document.title = `${m}:${s} — Focus`;
+}
+
+function toggleTimer() {
+  if (!running) {
+    running = true;
+    startBtn.textContent = 'Pausar';
+    startBtn.classList.add('running');
+    interval = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(interval);
+        running = false;
+        sessions++;
+        totalMinutes += Math.round((totalSeconds - remaining) / 60) + Math.floor(totalSeconds / 60);
+        updateStats();
+        new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA==').play().catch(()=>{});
+        startBtn.textContent = 'Iniciar';
+        startBtn.classList.remove('running');
+        remaining = totalSeconds;
+        updateDisplay();
+        alert('🎉 ¡Sesión completada! Tómate un descanso.');
+      }
+      updateDisplay();
+    }, 1000);
+  } else {
+    clearInterval(interval);
+    running = false;
+    startBtn.textContent = 'Continuar';
+    startBtn.classList.remove('running');
+  }
+}
+
+function resetTimer() {
+  clearInterval(interval);
+  running = false;
+  remaining = totalSeconds;
+  startBtn.textContent = 'Iniciar';
+  startBtn.classList.remove('running');
+  updateDisplay();
+}
+
+function skipSession() {
+  clearInterval(interval);
+  running = false;
+  remaining = totalSeconds;
+  startBtn.textContent = 'Iniciar';
+  startBtn.classList.remove('running');
+  updateDisplay();
+}
+
+function setMode(el, mins, label) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sessionLabel').textContent = label;
+  totalSeconds = mins * 60;
+  resetTimer();
+}
+
+function updateStats() {
+  document.getElementById('statSessions').textContent = sessions;
+  document.getElementById('statMinutes').textContent = totalMinutes;
+}
+
+updateDisplay();
+
+// ── Tasks ──
+let tasks = [
+  { id: 1, text: 'Revisar correos importantes', done: false, priority: 'high' },
+  { id: 2, text: 'Completar informe del proyecto', done: false, priority: 'mid' },
+  { id: 3, text: 'Llamar al cliente a las 4pm', done: true, priority: 'high' },
+];
+let nextId = 4;
+
+function renderTasks() {
+  const list = document.getElementById('taskList');
+  list.innerHTML = '';
+  tasks.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'task-item' + (t.done ? ' done' : '');
+    div.innerHTML = `
+      <div class="task-check" onclick="toggleTask(${t.id})">
+        <span class="check-icon">✓</span>
+      </div>
+      <span class="task-text">${t.text}</span>
+      <span class="task-priority priority-${t.priority}"></span>
+      <span class="task-del" onclick="deleteTask(${t.id})">✕</span>
+    `;
+    list.appendChild(div);
+  });
+  const pending = tasks.filter(t => !t.done).length;
+  document.getElementById('taskCount').textContent = `${pending} pendiente${pending !== 1 ? 's' : ''}`;
+  document.getElementById('statTasks').textContent = tasks.filter(t => t.done).length;
+}
+
+function addTask() {
+  const input = document.getElementById('taskInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const priorities = ['high','mid','low'];
+  tasks.unshift({ id: nextId++, text, done: false, priority: priorities[Math.floor(Math.random()*3)] });
+  input.value = '';
+  renderTasks();
+}
+
+function toggleTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (t) { t.done = !t.done; renderTasks(); updateStats(); }
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  renderTasks();
+}
+
+renderTasks();
+
+// ── Quotes ──
+const quotes = [
+  { text: 'La concentración es la raíz de toda habilidad humana.', author: 'Bruce Lee' },
+  { text: 'Haz una cosa cada vez, y hazla con toda tu energía.', author: 'Og Mandino' },
+  { text: 'La atención es la forma más básica del amor.', author: 'John Tarrant' },
+  { text: 'El éxito es la suma de pequeños esfuerzos repetidos día tras día.', author: 'Robert Collier' },
+  { text: 'Donde va la atención, fluye la energía.', author: 'T. Harv Eker' },
+  { text: 'Sé como el agua: flexible en la forma, constante en la esencia.', author: 'Lao Tzu' },
+];
+const q = quotes[Math.floor(Math.random() * quotes.length)];
+document.getElementById('quoteText').textContent = q.text;
+document.getElementById('quoteAuthor').textContent = '— ' + q.author;
+
+// ── Nav ──
+function setNav(el) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Citas Médicas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f2c4a 0%, #1a6e6e 50%, #0d4a2e 100%);
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(26,110,110,0.35) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 80%, rgba(13,74,46,0.4) 0%, transparent 55%),
+      radial-gradient(ellipse at 60% 10%, rgba(15,44,74,0.5) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    animation: float 8s ease-in-out infinite;
+  }
+  .orb-1 { width: 300px; height: 300px; background: rgba(26,180,160,0.12); top: -80px; left: -80px; animation-delay: 0s; }
+  .orb-2 { width: 250px; height: 250px; background: rgba(20,120,80,0.15); bottom: -60px; right: -60px; animation-delay: -3s; }
+  .orb-3 { width: 180px; height: 180px; background: rgba(15,44,74,0.25); top: 40%; left: 70%; animation-delay: -6s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 24px;
+    padding: 2.5rem 2.25rem;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
+    animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .icon-wrap {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, #1ab4a0, #0d8a5a);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(26,180,160,0.35);
+  }
+
+  .icon-wrap svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 0.35rem;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    margin: 1.75rem 0;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+  .field:last-of-type { margin-bottom: 0; }
+
+  label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 0.72rem 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: #fff;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.28); }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: rgba(26,180,160,0.7);
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 0 0 3px rgba(26,180,160,0.18);
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  select option { background: #1a3a3a; color: #fff; }
+
+  textarea { resize: none; line-height: 1.5; }
+
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.45);
+    cursor: pointer;
+  }
+
+  .btn {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1ab4a0 0%, #0d8a5a 100%);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(26,180,160,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(26,180,160,0.5); }
+  .btn:hover::before { opacity: 1; }
+  .btn:active { transform: translateY(0); }
+
+  .mensaje {
+    display: none;
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: rgba(26,180,160,0.15);
+    border: 1px solid rgba(26,180,160,0.3);
+    color: #7eecd9;
+    font-size: 0.88rem;
+    text-align: center;
+    line-height: 1.5;
+    animation: fadeIn 0.4s ease both;
+  }
+
+  .mensaje.visible { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .check-icon { display: inline-block; margin-right: 6px; font-size: 1rem; }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.35);
+    justify-content: center;
+    margin-top: 1.25rem;
+    letter-spacing: 0.05em;
+    width: 100%;
+  }
+
+  .tag::before, .tag::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+  }
+</style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="card">
+    <div class="header">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+      <h2>Agendar Cita Médica</h2>
+      <p class="subtitle">Reserva tu consulta en minutos</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <form id="form" action="#" method="GET">
+      <div class="field">
+        <label>Nombre completo</label>
+        <input type="text" name="nombre" placeholder="Ej. Laura Gómez" required>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Correo electrónico</label>
+          <input type="email" name="correo" placeholder="correo@mail.com" required>
+        </div>
+        <div class="field">
+          <label>Teléfono</label>
+          <input type="tel" name="telefono" placeholder="+57 300 000 0000" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Especialidad</label>
+        <select name="especialidad" required>
+          <option value="">Seleccione una especialidad</option>
+          <option>Medicina General</option>
+          <option>Pediatría</option>
+          <option>Cardiología</option>
+          <option>Dermatología</option>
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Fecha</label>
+          <input type="date" name="fecha" required>
+        </div>
+        <div class="field">
+          <label>Hora</label>
+          <input type="time" name="hora" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Motivo de la consulta</label>
+        <textarea name="motivo" rows="3" placeholder="Describe brevemente tu motivo..."></textarea>
+      </div>
+
+      <button type="submit" class="btn">Reservar mi cita</button>
+    </form>
+
+    <div id="mensaje" class="mensaje">
+      <span class="check-icon">✓</span> ¡Tu cita ha sido apartada! Nos vemos en la fecha indicada.
+    </div>
+
+    <p class="tag">Consulta segura y confidencial</p>
+  </div>
+
+  <script>
+    document.getElementById('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('mensaje').classList.add('visible');
+      this.reset();
+    });
+  </script>
+</body>
+</html>
